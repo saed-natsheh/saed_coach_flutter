@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:saed_coach/screens/GameDetialsScreen.dart';
+import 'package:saed_coach/screens/LoginScreen.dart';
+import 'package:saed_coach/screens/RegistrationScreen.dart';
 
 class SaedApp extends StatelessWidget {
   const SaedApp({super.key});
@@ -16,18 +19,85 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class _HomePageScreenState extends State<HomePageScreen> {
-  String pageName = 'Club Manage';
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  String pageName = 'Rungis';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(color: Color(0xff3055a3)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Icon(Icons.sports_soccer, size: 48, color: Colors.white),
+                  SizedBox(height: 8),
+                  Text(
+                    'Rungis',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.home),
+              title: Text('Home'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.app_registration),
+              title: Text('Register'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RegistrationScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.login),
+              title: Text('Login'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.contact_mail),
+              title: Text('Contact Us'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.privacy_tip),
+              title: Text('Privacy'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        centerTitle: false,
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.menu))],
+        centerTitle: true,
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.sports_football_outlined, color: Colors.green),
+            Image.asset('assets/logo_main.png', height: 30),
             SizedBox(width: 6),
             Text(pageName),
           ],
@@ -56,7 +126,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   ),
                   child: Column(
                     children: [
-                      Icon(Icons.people, color: Colors.green),
+                      Icon(Icons.people, color: Color(0xff3055a3)),
                       SizedBox(height: 6),
                       Text('7'),
                       SizedBox(height: 6),
@@ -80,7 +150,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   ),
                   child: Column(
                     children: [
-                      Icon(Icons.calendar_month, color: Colors.green),
+                      Icon(Icons.calendar_month, color: Color(0xff3055a3)),
                       SizedBox(height: 6),
                       Text('14'),
                       SizedBox(height: 6),
@@ -104,7 +174,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   ),
                   child: Column(
                     children: [
-                      Icon(Icons.person, color: Colors.green),
+                      Icon(Icons.person, color: Color(0xff3055a3)),
                       SizedBox(height: 6),
                       Text('122'),
                       SizedBox(height: 6),
@@ -144,7 +214,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 16),
                         decoration: BoxDecoration(
-                          color: Colors.green.withValues(alpha: 0.2),
+                          color: Color(0xff3055a3).withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text('Sat 15 Jun'),
@@ -154,7 +224,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   SizedBox(height: 12),
                   Row(
                     children: [
-                      Icon(Icons.security, color: Colors.green, size: 36),
+                      Icon(Icons.security, color: Color(0xff3055a3), size: 36),
                       SizedBox(width: 12),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,43 +241,48 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     children: [
                       InkWell(
                         onTap: () {
-                          pageName = 'Saed';
-                          setState(() {});
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => GameDetailsPage(),
+                            ),
+                          );
                         },
                         child: Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
                           padding: EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.green.withValues(alpha: 0.2),
+                            color: Color(0xff3055a3).withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: Text('Detieals'),
+                          child: Center(child: Text('Detieals')),
                         ),
                       ),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text('LineUp'),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.yellowAccent.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text('Stream'),
-                      ),
+                      // Container(
+                      //   padding: EdgeInsets.symmetric(
+                      //     horizontal: 16,
+                      //     vertical: 8,
+                      //   ),
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.blue.withValues(alpha: 0.2),
+                      //     borderRadius: BorderRadius.circular(16),
+                      //   ),
+                      //   child: Text('LineUp'),
+                      // ),
+                      // Container(
+                      //   padding: EdgeInsets.symmetric(
+                      //     horizontal: 16,
+                      //     vertical: 8,
+                      //   ),
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.yellowAccent.withValues(alpha: 0.2),
+                      //     borderRadius: BorderRadius.circular(16),
+                      //   ),
+                      //   child: Text('Stream'),
+                      // ),
                     ],
                   ),
                 ],
