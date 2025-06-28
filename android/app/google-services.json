@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1073987209432",
+    "project_id": "saedcoach",
+    "storage_bucket": "saedcoach.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1073987209432:android:df93a263ff3c33172fefad",
+        "android_client_info": {
+          "package_name": "com.example.saed_coach"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNVTLlnXWDjdtAqs54mrlnCkMAOIRISQE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

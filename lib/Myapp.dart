@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:saed_coach/screens/GameDetialsScreen.dart';
-import 'package:saed_coach/screens/LoginScreen.dart';
-import 'package:saed_coach/screens/RegistrationScreen.dart';
+import 'package:saed_coach/screens/admin/AdminDashboard.dart';
+import 'package:saed_coach/screens/auth/LoginScreen.dart';
+import 'package:saed_coach/screens/auth/RegistrationScreen.dart';
 
 class SaedApp extends StatelessWidget {
   const SaedApp({super.key});
@@ -76,9 +77,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
             ),
             ListTile(
               leading: Icon(Icons.contact_mail),
-              title: Text('Contact Us'),
+              title: Text('AdminDashboard'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AdminDashboard()),
+                );
               },
             ),
             ListTile(
