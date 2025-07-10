@@ -1,45 +1,95 @@
 import 'package:flutter/material.dart';
+import 'package:saed_coach/models/models.dart';
+import 'package:saed_coach/screens/games/PlayerServices.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class GameDetailsPage extends StatelessWidget {
+class GameDetailsPage extends StatefulWidget {
+  final Game game;
+
+  const GameDetailsPage({Key? key, required this.game}) : super(key: key);
+
+  @override
+  _GameDetailsPageState createState() => _GameDetailsPageState();
+}
+
+class _GameDetailsPageState extends State<GameDetailsPage> {
+  final PlayerService _playerService = PlayerService();
+  List<Player> players = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPlayers();
+  }
+
+  Future<void> _fetchPlayers() async {
+    try {
+      final playersList = await _playerService.getPlayersByClub(widget.game.homeClubId).first;
+      setState(() {
+        players = playersList;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching players: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _launchMaps(String address) async {
+    final url = 'https://www.google.com/maps/search/?api=1&query=$address';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+ 
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Game Details'),
         centerTitle: true,
         actions: [Icon(Icons.more_vert)],
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(12),
-        child: Column(
-          children: [
-            _gameCard(),
-            SizedBox(height: 12),
-            _venueCard(),
-            SizedBox(height: 12),
-            _startingLineupCard(),
-            SizedBox(height: 12),
-            _playerAttendanceCard(),
-            SizedBox(height: 12),
-            _actionButtons(),
-            SizedBox(height: 12),
-            _coachNotesCard(),
-          ],
-        ),
-      ),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: EdgeInsets.all(12),
+              child: Column(
+                children: [
+                  _gameCard(),
+                  SizedBox(height: 12),
+                  _venueCard(),
+                  SizedBox(height: 12),
+                  _startingLineupCard(),
+                  SizedBox(height: 12),
+                  _playerAttendanceCard(),
+                  SizedBox(height: 12),
+                  _actionButtons(),
+                  SizedBox(height: 12),
+                  _coachNotesCard(),
+                ],
+              ),
+            ),
     );
   }
 
   Widget _gameCard() {
     return Card(
-      color: Color(0xff3055a3).withValues(alpha: 0.4),
+      color: Color(0xff3055a3).withOpacity(0.4),
       child: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Lions FC vs Eagles',
+              widget.game.title,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -59,7 +109,7 @@ class GameDetailsPage extends StatelessWidget {
                   children: [
                     Text('Date', style: TextStyle(color: Colors.white)),
                     Text(
-                      'Sat, Jun 15',
+                     widget.game.date!.toString(),
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -71,7 +121,7 @@ class GameDetailsPage extends StatelessWidget {
                   children: [
                     Text('Time', style: TextStyle(color: Colors.white)),
                     Text(
-                      '14:30',
+                      widget.game.time,
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -81,7 +131,7 @@ class GameDetailsPage extends StatelessWidget {
                 ),
                 Chip(
                   label: Text(
-                    "UPCOMING",
+                    widget.game.status.toUpperCase(),
                     style: TextStyle(color: Color(0xff3055a3)),
                   ),
                   backgroundColor: Colors.white,
@@ -98,17 +148,20 @@ class GameDetailsPage extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: Icon(Icons.location_on, color: Color(0xff3055a3)),
-        title: Text('City Arena Stadium'),
-        subtitle: Text('123 Sports Avenue, Downtown'),
+        title: Text(widget.game.venue.name),
+        subtitle: Text(widget.game.venue.address),
         trailing: Text(
           'Get Directions',
           style: TextStyle(color: Color(0xff3055a3)),
         ),
+        onTap: () => _launchMaps(widget.game.venue.address),
       ),
     );
   }
 
   Widget _startingLineupCard() {
+    final lineupPlayers = players.where((player) => widget.game.lineup.contains(player.id)).toList();
+    
     return Card(
       child: Padding(
         padding: EdgeInsets.all(16),
@@ -122,7 +175,7 @@ class GameDetailsPage extends StatelessWidget {
                 ),
                 Spacer(),
                 Text(
-                  '11/11 Confirmed',
+                  '${lineupPlayers.length}/11 Confirmed',
                   style: TextStyle(color: Color(0xff3055a3)),
                 ),
               ],
@@ -136,19 +189,13 @@ class GameDetailsPage extends StatelessWidget {
                   alignment: WrapAlignment.center,
                   spacing: 10,
                   runSpacing: 10,
-                  children: [
-                    _playerCircle("8", "Carter"),
-                    _playerCircle("11", "Johnson"),
-                    _playerCircle("7", "Davis"),
-                    _playerCircle("3", "Woods"),
-                    _playerCircle("6", "Smith"),
-                    _playerCircle("10", "Brown"),
-                    _playerCircle("3", "Wilson"),
-                    _playerCircle("5", "Taylor"),
-                    _playerCircle("6", "Miller"),
-                    _playerCircle("2", "Garcia"),
-                    _playerCircle("1", "Lee", isKeeper: true),
-                  ],
+                  children: lineupPlayers.take(11).map((player) => 
+                    _playerCircle(
+                      player.number.toString(), 
+                      player.name.split(' ').last,
+                      isKeeper: player.position.toLowerCase().contains('keeper')
+                    )
+                  ).toList(),
                 ),
               ],
             ),
@@ -183,26 +230,26 @@ class GameDetailsPage extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 12),
-            _attendanceRow(
-              "Max Carter",
-              "Forward • #9",
-              Color(0xff3055a3),
-              "Confirmed",
-            ),
-            _attendanceRow(
-              "Ella Woods",
-              "Midfielder • #8",
-              Color(0xfff1e60e),
-              "Pending",
-            ),
-            _attendanceRow(
-              "Sandra Lee",
-              "Goalkeeper • #1",
-              Colors.redAccent,
-              "Unavailable",
-            ),
+            ...players.map((player) {
+              final status = widget.game.attendance.contains(player.id) 
+                  ? "Confirmed" 
+                  : "Pending";
+              final color = status == "Confirmed" 
+                  ? Color(0xff3055a3) 
+                  : Color(0xfff1e60e);
+              
+              return _attendanceRow(
+                player.name,
+                "${player.position} • #${player.number}",
+                color,
+                status,
+              );
+            }).toList(),
             SizedBox(height: 12),
-            ElevatedButton(onPressed: () {}, child: Text("Update Attendance")),
+            ElevatedButton(
+              onPressed: () {}, 
+              child: Text("Update Attendance")
+            ),
           ],
         ),
       ),
@@ -217,8 +264,8 @@ class GameDetailsPage extends StatelessWidget {
   ) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundImage: AssetImage('assets/profile.png'),
-      ), // Replace with NetworkImage or Asset
+        child: Text(name[0]), // First letter of name
+      ),
       title: Text(name),
       subtitle: Text(position),
       trailing: Chip(
@@ -241,8 +288,7 @@ class GameDetailsPage extends StatelessWidget {
               style: TextStyle(color: Color(0xff3055a3)),
             ),
             style: ElevatedButton.styleFrom(backgroundColor: Color(0xfff1e60e)),
-          ),
-        ),
+        )),
         SizedBox(width: 12),
         Expanded(
           child: ElevatedButton.icon(
@@ -269,7 +315,9 @@ class GameDetailsPage extends StatelessWidget {
             Text("Coach Notes", style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
             Text(
-              "Focus on possession and quick passing.\nEagles are strong on counter-attacks, so maintain defensive shape.",
+              widget.game.coachNotes.isNotEmpty 
+                  ? widget.game.coachNotes 
+                  : "No notes available",
               style: TextStyle(color: Colors.black87),
             ),
             SizedBox(height: 12),
